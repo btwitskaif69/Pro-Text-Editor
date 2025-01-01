@@ -3,6 +3,7 @@ import Navbar from './Components/Navbar';
 import TextForm from './Components/TextForm';
 import React, { useState } from 'react';
 import Alert from './Components/Alert';
+import Footer from './Components/Footer';
 
 function App() {
   const [mode, setMode] = useState('light'); 
@@ -41,6 +42,8 @@ function App() {
         <div className="container my-4" style={{ backgroundColor: mode === 'dark' ? 'rgb(33, 37, 41)' : 'white' }}>
             <TextForm showAlert={showAlert} heading="Enter Text To Analyze" mode={mode} />
         </div>
+        <Footer mode={mode} />
+
     </>
   );
 }

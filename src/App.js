@@ -32,7 +32,7 @@ function App() {
 
   return (
     <>
-        <Navbar title="Text Editor" mode={mode} toggleMode={toggleMode} />
+        <Navbar title="Pro Text Editor" mode={mode} toggleMode={toggleMode} />
 
 
         <Alert alert={alert} />

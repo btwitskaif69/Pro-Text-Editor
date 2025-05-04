@@ -6,7 +6,6 @@ export default function TextForm(props) {
     const [spokenWordIndex, setSpokenWordIndex] = useState(-1);
     const [msg, setMsg] = useState(null);
     const [isPaused, setIsPaused] = useState(false);
-
     const highlightedWordRef = useRef(null);
 
     useEffect(() => {
@@ -40,7 +39,7 @@ export default function TextForm(props) {
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (event.code === 'Space' && document.activeElement !== document.getElementById('myBox')) {
-                event.preventDefault(); 
+                event.preventDefault();
                 if (isSpeaking) {
                     if (!isPaused) {
                         window.speechSynthesis.pause();
@@ -54,9 +53,7 @@ export default function TextForm(props) {
                 }
             }
         };
-
         document.addEventListener('keydown', handleKeyDown);
-
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
@@ -70,190 +67,136 @@ export default function TextForm(props) {
         }
     };
 
-    const handleUpClick = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        let newText = text.toUpperCase();
-        setText(newText);
-        props.showAlert("Converted to Uppercase!", "success");
-    }
+    const wordCount = () => text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
 
-    const handleloClick = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        let newText = text.toLowerCase();
-        setText(newText);
-        props.showAlert("Converted to Lowercase!", "success");
-    }
-
-    const handletiClick = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        let newText = text.toLowerCase().split(' ').map((word) => {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        }).join(' ');
-        setText(newText);
-        props.showAlert("Converted to Titlecase!", "success");
-    }
-
-    const handlesenClick = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        let newText = text.trim();
-        newText = newText.toLowerCase(); 
-        newText = newText.charAt(0).toUpperCase() + newText.slice(1); 
-        setText(newText);
-        props.showAlert("Converted to Sentence Case!", "success");
-    }
-
-    const handleextraspaces = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        let newText = text.split(/\s+/);
-        setText(newText.join(" "));
-        props.showAlert("Extra Spaces Removed!", "success");
-    }
-
-    const handlecopy = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        var textToCopy = document.getElementById('myBox');
-        textToCopy.select();
-        navigator.clipboard.writeText(textToCopy.value);
-        document.getSelection().removeAllRanges();
+    const handleOnChange = (e) => setText(e.target.value);
+    const handleUpper = () => textAction(text.toUpperCase(), "Converted to Uppercase!");
+    const handleLower = () => textAction(text.toLowerCase(), "Converted to Lowercase!");
+    const handleTitle = () => {
+        const newText = text.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        textAction(newText, "Converted to Titlecase!");
+    };
+    const handleSentence = () => {
+        const newText = text.toLowerCase();
+        textAction(newText.charAt(0).toUpperCase() + newText.slice(1), "Converted to Sentence Case!");
+    };
+    const handleSpaces = () => textAction(text.split(/\s+/).join(" "), "Extra spaces removed!");
+    const handleCopy = () => {
+        navigator.clipboard.writeText(text);
         props.showAlert("Copied to Clipboard!", "success");
-    }
-
+    };
+    const handleClear = () => textAction('', "Text Cleared!");
     const handleDownload = () => {
-        if (text.trim() === '') {
-            props.showAlert("Cannot download file. Text is empty!", "danger");
-            return;
-        }
-        const element = document.createElement("a");
-        const file = new Blob([text], { type: 'text/plain' });
-        element.href = URL.createObjectURL(file);
-        element.download = "myTextFile.txt";
-        document.body.appendChild(element);
-        element.click();
+        const blob = new Blob([text], { type: 'text/plain' });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "text.txt";
+        a.click();
         props.showAlert("File Downloaded!", "success");
-    }
-
-    const handleclrClick = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is already empty!", "info");
-            return;
-        }
-        let newText = '';
-        setText(newText);
-        props.showAlert("Text Cleared!", "success");
-    }
+    };
+    const textAction = (updatedText, alertMsg) => {
+        if (text.trim() === '') return props.showAlert("Text is empty.", "warning");
+        setText(updatedText);
+        props.showAlert(alertMsg, "success");
+    };
 
     const speak = () => {
-        if (text.trim() === '') {
-            props.showAlert("Text is empty. Please enter some text.", "warning");
-            return;
-        }
-        setIsSpeaking(true);
-        let newMsg = new SpeechSynthesisUtterance();
-        newMsg.text = text;
+        if (text.trim() === '') return props.showAlert("Text is empty.", "warning");
+        const utter = new SpeechSynthesisUtterance(text);
         let currentIndex = 0;
-        newMsg.onboundary = (event) => {
-            if (event.name === 'word') {
-                setSpokenWordIndex(currentIndex);
-                currentIndex++;
-            }
+        utter.onboundary = (e) => {
+            if (e.name === 'word') setSpokenWordIndex(currentIndex++);
         };
-        newMsg.onend = () => {
+        utter.onend = () => {
             setIsSpeaking(false);
             setSpokenWordIndex(-1);
             setMsg(null);
         };
-        window.speechSynthesis.speak(newMsg);
-        setMsg(newMsg);
+        window.speechSynthesis.speak(utter);
+        setIsSpeaking(true);
+        setMsg(utter);
         props.showAlert("Speaking!", "success");
     };
 
     const stop = () => {
-        if (text.trim() === '') {
-            props.showAlert("No text to stop speaking!", "warning");
-            return;
-        }
-        if (!isPaused) {
-            window.speechSynthesis.pause();
-            setIsPaused(true);
-        } else {
+        if (!isSpeaking) return props.showAlert("Nothing to pause/resume.", "warning");
+        if (isPaused) {
             window.speechSynthesis.resume();
             setIsPaused(false);
+            props.showAlert("Resumed Speaking!", "success");
+        } else {
+            window.speechSynthesis.pause();
+            setIsPaused(true);
+            props.showAlert("Paused Speaking!", "success");
         }
-        props.showAlert(isPaused ? "Resumed Speaking!" : "Paused Speaking!", "success");
-    };
-
-    const wordCount = (text) => {
-        let regex = /\s+\S+/;
-        let numOfWords = text.split(regex);
-        return numOfWords.length;
-    };
-
-    const handleOnChange = (event) => {
-        setText(event.target.value);
     };
 
     return (
-        <>
-            <div className='container my-3' style={{ color: props.mode === 'dark' ? 'white' : '#042743' }}>
-                <h1 className='container text-center my-4'>{props.heading}</h1>
-                <div className="mb-3 container text-center">
-                    <textarea
-                        className="form-control"
-                        value={text}
-                        onChange={handleOnChange}
-                        onFocus={handleTextFocus} 
-                        id="myBox"
-                        style={{
-                            backgroundColor: props.mode === 'dark' ? 'rgb(33 37 41)' : 'white',
-                            color: props.mode === 'dark' ? 'white' : 'black'
-                        }}
-                        rows="10"
-                    ></textarea>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handleUpClick}>Convert to Uppercase</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handleloClick}>Convert to Lowercase</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handletiClick}>Convert to Titlecase</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handlesenClick}>Convert to Sentence Case</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handleextraspaces}>Remove Extra Spaces</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handlecopy}>Copy Text</button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={speak}><i className="bi bi-volume-up"></i></button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={stop}>
-                        {isPaused ? <i className="bi bi-play"></i> : <i className="bi bi-pause"></i>}
-                    </button>
-                    <button className="btn btn-primary btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handleDownload}>Download File</button>
-                    <button className="btn btn-danger btn-m my-4 mx-1 mb-0 text-nowrap" onClick={handleclrClick}>Clear</button>
-                </div>
+        <div className="container my-5">
+            <h2 className="text-center fw-semibold mb-4">{props.heading}</h2>
+
+            <textarea
+                className="form-control mb-3 p-3"
+                id="myBox"
+                rows="7"
+                value={text}
+                onChange={handleOnChange}
+                onFocus={handleTextFocus}
+                placeholder="Type or paste your text here..."
+                style={{
+                    backgroundColor: props.mode === 'dark' ? '#000000' : 'white',  // Dark mode: #000000 (dark black)
+                    color: props.mode === 'dark' ? 'white' : 'black',               // Text color: white for dark mode
+                    border: props.mode === 'dark' ? '1px solid white' : '1px solid #ccc',
+                }}
+            ></textarea>
+
+            <div className="d-flex flex-wrap gap-2 mb-4 justify-content-center">
+                <button className="btn btn-outline-primary btn-sm" onClick={handleUpper}>Uppercase</button>
+                <button className="btn btn-outline-primary btn-sm" onClick={handleLower}>Lowercase</button>
+                <button className="btn btn-outline-primary btn-sm" onClick={handleTitle}>Titlecase</button>
+                <button className="btn btn-outline-primary btn-sm" onClick={handleSentence}>Sentence</button>
+                <button className="btn btn-outline-primary btn-sm" onClick={handleSpaces}>Trim Spaces</button>
+                <button className="btn btn-outline-success btn-sm" onClick={handleCopy}>Copy</button>
+                <button className="btn btn-outline-warning btn-sm" onClick={speak}>Speak</button>
+                <button className="btn btn-outline-info btn-sm" onClick={stop}>{isPaused ? "Resume" : "Pause"}</button>
+                <button className="btn btn-outline-success btn-sm" onClick={handleDownload}>Download</button>
+                <button className="btn btn-outline-danger btn-sm" onClick={handleClear}>Clear</button>
             </div>
-            <div className="container my-3" style={{ color: props.mode === 'dark' ? 'white' : '#042743' }}>
-                <h2 className='container text-center'>Your Text Summary</h2>
-                <p className='container text-center'>{text === "" ? 0 : wordCount(text)} words and {text.length} characters</p>
-                <p className='text-center'>{0.008 * text.split(/\s+/).filter((element) => { return element.length !== 0 }).length} Minutes to Read</p>
-                <h2 className='container text-center'>Preview</h2>
-                <p className='container text-center'>
-                    {text.split(/\s+/).map((word, index) => (
-                        <span ref={index === spokenWordIndex ? highlightedWordRef : null} key={index} style={{ backgroundColor: isSpeaking && index === spokenWordIndex ? 'yellow' : 'transparent', color: isSpeaking && index === spokenWordIndex && props.mode === 'dark' ? 'black' : 'inherit', fontSize: text.trim() ? '30px' : 'inherit' }}>
-                            {word}{' '}
-                        </span>
-                    ))}
-                </p>
+
+            <div className="mt-4 text-center">
+                <h5 className="fw-semibold">Summary</h5>
+                <p className="mb-1">{wordCount()} words | {text.length} characters</p>
+                <p className="text-muted small">{(0.008 * wordCount()).toFixed(2)} minute read</p>
             </div>
-        </>
+
+            <div className="mt-4 text-center">
+    <h5 className="fw-semibold">Preview</h5>
+    <div
+        className="p-3 border rounded"
+        style={{
+            minHeight: '100px',
+            backgroundColor: props.mode === 'dark' ? '#000000' : 'white',  // Dark mode: #000000 (dark black), Light mode: #f8f9fa (light gray)
+            color: props.mode === 'dark' ? 'white' : 'black',  // Text color: white for dark mode and black for light mode
+        }}
+    >
+        {text
+            ? text.split(/\s+/).map((word, index) => (
+                <span
+                    key={index}
+                    ref={index === spokenWordIndex ? highlightedWordRef : null}
+                    style={{
+                        backgroundColor: isSpeaking && index === spokenWordIndex ? '#ffecb3' : 'transparent',
+                        color: isSpeaking && index === spokenWordIndex ? '#000' : 'inherit',
+                        marginRight: '5px'
+                    }}
+                >
+                    {word}
+                </span>
+            ))
+            : <span className="text-muted">Nothing to preview.</span>}
+    </div>
+</div>
+
+        </div>
     );
 }

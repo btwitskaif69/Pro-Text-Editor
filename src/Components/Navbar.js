@@ -14,20 +14,21 @@ export default function Navbar({ title, mode, toggleMode }) {
         <a className="navbar-brand fs-3" href="/" style={{
         backgroundColor: mode === 'dark' ? '#000000' : '#ffffff', // Set pure black for dark mode
         color: mode === 'dark' ? '#ffffff' : '#000000', fontWeight: '500'// Text color to light or dark
-      }}><i class="bi bi-file-earmark-text"></i>
+      }}><i className="bi bi-file-earmark-text"></i>
           {title}
         </a>
         <button
-          className="navbar-toggler border-0"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-          aria-controls="navbarContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+  className={`navbar-toggler border-0 custom-toggler ${mode === 'light' ? 'light' : ''}`}
+  type="button"
+  data-bs-toggle="collapse"
+  data-bs-target="#navbarContent"
+  aria-controls="navbarContent"
+  aria-expanded="false"
+  aria-label="Toggle navigation"
+>
+  <span className="navbar-toggler-icon"></span>
+</button>
+
 
         <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
           <div className="form-check form-switch">

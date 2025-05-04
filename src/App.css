@@ -160,3 +160,28 @@ body {
   }
   
 }
+/* Ensures the switch visually changes in dark mode */
+.form-check-input:checked {
+  background-color: #0d6efd; /* Blue or your preferred color */
+  border-color: #0d6efd;
+}
+
+body.dark-mode .form-check-input {
+  background-color: #dee2e6;
+  border-color: #ced4da;
+}
+
+body.dark-mode .form-check-input:checked {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* Custom toggler icon */
+.custom-toggler .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Light mode version */
+.custom-toggler.light .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}

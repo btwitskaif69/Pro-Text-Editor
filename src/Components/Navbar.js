@@ -11,10 +11,10 @@ export default function Navbar({ title, mode, toggleMode }) {
       }}
     >
       <div className="container-fluid">
-        <a className="navbar-brand fs-3 bi bi-file-earmark-text" href="/" style={{
+        <a className="navbar-brand fs-3" href="/" style={{
         backgroundColor: mode === 'dark' ? '#000000' : '#ffffff', // Set pure black for dark mode
         color: mode === 'dark' ? '#ffffff' : '#000000', fontWeight: '500'// Text color to light or dark
-      }}>
+      }}><i class="bi bi-file-earmark-text"></i>
           {title}
         </a>
         <button

@@ -169,7 +169,7 @@ export default function TextForm(props) {
                 <p className="text-muted small">{(0.008 * wordCount()).toFixed(2)} minute read</p>
             </div>
 
-            <div className="mt-4 text-center">
+            <div className="container mt-4 text-center">
     <h5 className="fw-semibold">Preview</h5>
     <div
         className="p-3 border rounded"

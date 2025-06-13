@@ -177,6 +177,9 @@ export default function TextForm(props) {
             minHeight: '100px',
             backgroundColor: props.mode === 'dark' ? '#000000' : 'white',  // Dark mode: #000000 (dark black), Light mode: #f8f9fa (light gray)
             color: props.mode === 'dark' ? 'white' : 'black',  // Text color: white for dark mode and black for light mode
+              wordWrap: 'break-word',
+        overflowWrap: 'break-word',
+        whiteSpace: 'normal',
         }}
     >
         {text
